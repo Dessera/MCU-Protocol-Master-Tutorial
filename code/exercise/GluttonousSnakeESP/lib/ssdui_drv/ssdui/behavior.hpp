@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "core.hpp"
+#include "context.hpp"
 
 class SSDrvBehavior {
  public:
@@ -18,6 +18,7 @@ class SSDrvBehavior {
 
 class SSDrvBehaviorBuilder {
  private:
+  // ! Self is just a name, there is only ONE instance during the add chain
   using Self = SSDrvBehaviorBuilder;
   std::vector<std::unique_ptr<SSDrvBehavior>> m_behaviors{};
   std::shared_ptr<SSDrvContext> m_context{nullptr};
@@ -28,17 +29,20 @@ class SSDrvBehaviorBuilder {
       : m_context(std::move(context)) {}
   ~SSDrvBehaviorBuilder() = default;
 
-  inline Self add(std::unique_ptr<SSDrvBehavior> behavior) {
+  inline Self& add(std::unique_ptr<SSDrvBehavior> behavior) {
     m_behaviors.push_back(std::move(behavior));
     return *this;
   }
 
-  inline Self context(std::shared_ptr<SSDrvContext> context) {
+  inline Self& context(std::shared_ptr<SSDrvContext> context) {
     m_context = std::move(context);
     return *this;
   }
 
   inline void apply() {
+    if (m_context == nullptr) {
+      return;
+    }
     std::for_each(m_behaviors.begin(), m_behaviors.end(),
                   [this](std::unique_ptr<SSDrvBehavior>& behavior) {
                     behavior->apply(m_context);
