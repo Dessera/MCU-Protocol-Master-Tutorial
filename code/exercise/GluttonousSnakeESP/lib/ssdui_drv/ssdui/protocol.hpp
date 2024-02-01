@@ -3,11 +3,13 @@
 
 #include <cstdint>
 
+#include "ssdui/create.hpp"
+
 /**
  * @brief 显示驱动协议接口
  *        事实上，Arduino提供了类似的接口，该层只是为了更好地抽象
  */
-class ISSDrvProtocol {
+class ISSDrvProtocol: public CreateToUniquePtr<ISSDrvProtocol> {
  public:
   virtual ~ISSDrvProtocol() = default;
 
@@ -17,6 +19,10 @@ class ISSDrvProtocol {
   virtual void write(uint8_t data) = 0;
 };
 
+/**
+ * @brief 通信接口配置对象
+ * 
+ */
 struct SSDrvI2CProtocolConfig {
   uint8_t address;
   uint8_t sda;

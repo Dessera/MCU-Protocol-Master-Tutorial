@@ -15,7 +15,7 @@ struct SSDrvContextConfig {
       : protocol(std::move(protocol)), width(width), height(height) {}
 };
 
-class SSDrvContext {
+class SSDrvContext : public CreateToSharedPtr<SSDrvContext> {
  private:
   SSDrvContextConfig m_config;
 

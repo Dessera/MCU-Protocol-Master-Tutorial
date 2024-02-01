@@ -13,7 +13,7 @@ class SSDrvBehaviorTest : public SSDrvBehavior {
 class SSDrvBehaviorPrintWH : public SSDrvBehavior {
  public:
   void apply(std::shared_ptr<SSDrvContext> context) override {
-    Serial.println("SSDrvBehaviorPrintWH::WH");
+    Serial.println("SSDrvBehaviorPrintWH::apply");
     Serial.print("width: ");
     Serial.println(context->config().width);
     Serial.print("height: ");
@@ -21,20 +21,32 @@ class SSDrvBehaviorPrintWH : public SSDrvBehavior {
   }
 };
 
+class SSDrvBehaviorWithParam : public SSDrvBehavior {
+ private:
+  int m_param{0};
+
+ public:
+  explicit SSDrvBehaviorWithParam(int param) : m_param(param) {}
+  void apply(std::shared_ptr<SSDrvContext> context) override {
+    Serial.println("SSDrvBehaviorWithParam::apply");
+    Serial.print("param: ");
+    Serial.println(m_param);
+  }
+};
+
 void setup() {
   Serial.begin(115200);
 
-  auto protocol = std::unique_ptr<ISSDrvProtocol>(
-      new SSDrvI2CProtocol(SSDrvI2CProtocolConfig{0x3c, 4, 5, Wire}));
-  auto context = std::make_shared<SSDrvContext>(
-      SSDrvContextConfig(std::move(protocol), 128, 64));
+  auto context = SSDrvContext::create(
+      SSDrvContextConfig(ISSDrvProtocol::create<SSDrvI2CProtocol>(
+                             SSDrvI2CProtocolConfig{0x3c, 4, 5, Wire}),
+                         128, 64));
 
   SSDrvBehaviorBuilder(context)
-      .add(std::unique_ptr<SSDrvBehavior>(new SSDrvBehaviorTest()))
-      .add(std::unique_ptr<SSDrvBehavior>(new SSDrvBehaviorPrintWH()))
+      .add(SSDrvBehavior::create<SSDrvBehaviorTest>())
+      .add(SSDrvBehavior::create<SSDrvBehaviorPrintWH>())
+      .add(SSDrvBehavior::create<SSDrvBehaviorWithParam>(123))
       .apply();
 }
 
-void loop() {
-  delay(1000);
-}
+void loop() { delay(1000); }
