@@ -25,7 +25,7 @@ void setup() {
   Serial.begin(115200);
 
   auto protocol = std::unique_ptr<ISSDrvProtocol>(
-      new SSDrvI2CProtocol(SSDrvI2CProtocolConfig{0x3c, 4, 15, Wire}));
+      new SSDrvI2CProtocol(SSDrvI2CProtocolConfig{0x3c, 4, 5, Wire}));
   auto context = std::make_shared<SSDrvContext>(
       SSDrvContextConfig(std::move(protocol), 128, 64));
 
@@ -36,6 +36,5 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   delay(1000);
 }
