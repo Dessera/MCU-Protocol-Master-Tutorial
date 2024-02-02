@@ -26,4 +26,5 @@ class SSDrvContext : public CreateToSharedPtr<SSDrvContext> {
   }
 
   inline const SSDrvContextConfig& config() const { return m_config; }
+  inline const ISSDrvProtocol& protocol() const { return *m_config.protocol; }
 };

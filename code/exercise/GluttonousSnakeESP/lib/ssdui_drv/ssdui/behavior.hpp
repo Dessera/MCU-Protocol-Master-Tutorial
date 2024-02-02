@@ -42,7 +42,7 @@ class SSDrvBehaviorBuilder {
 
   inline void apply() {
     if (m_context == nullptr) {
-      // ! Im normal case, should throw an exception
+      // ! In normal case, should throw an exception
       // ! But may mcu compiler does not support exception
       // ? Thinking to use an Result Type
       return;

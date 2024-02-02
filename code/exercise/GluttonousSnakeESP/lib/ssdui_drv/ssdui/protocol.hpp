@@ -9,7 +9,7 @@
  * @brief 显示驱动协议接口
  *        事实上，Arduino提供了类似的接口，该层只是为了更好地抽象
  */
-class ISSDrvProtocol: public CreateToUniquePtr<ISSDrvProtocol> {
+class ISSDrvProtocol : public CreateToUniquePtr<ISSDrvProtocol> {
  public:
   virtual ~ISSDrvProtocol() = default;
 
@@ -17,11 +17,15 @@ class ISSDrvProtocol: public CreateToUniquePtr<ISSDrvProtocol> {
    * @brief 向显示驱动发送数据
    */
   virtual void write(uint8_t data) = 0;
+
+  void write(uint8_t data) const {
+    const_cast<ISSDrvProtocol*>(this)->write(data);
+  }
 };
 
 /**
  * @brief 通信接口配置对象
- * 
+ *
  */
 struct SSDrvI2CProtocolConfig {
   uint8_t address;
