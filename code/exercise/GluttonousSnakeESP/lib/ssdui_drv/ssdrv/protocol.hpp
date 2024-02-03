@@ -3,15 +3,20 @@
 
 #include <cstdint>
 
-#include "ssdui/create.hpp"
+#include "ssdrv/constant.hpp"
+#include "ssdrv/create.hpp"
+
+SSDRV_NS_BEGIN
+
+namespace protocol {
 
 /**
  * @brief 显示驱动协议接口
  *        事实上，Arduino提供了类似的接口，该层只是为了更好地抽象
  */
-class ISSDrvProtocol : public CreateToUniquePtr<ISSDrvProtocol> {
+class IProtocol : public CreateToUniquePtr<IProtocol> {
  public:
-  virtual ~ISSDrvProtocol() = default;
+  virtual ~IProtocol() = default;
 
   /**
    * @brief 向显示驱动发送数据
@@ -19,7 +24,7 @@ class ISSDrvProtocol : public CreateToUniquePtr<ISSDrvProtocol> {
   virtual void write(uint8_t data) = 0;
 
   void write(uint8_t data) const {
-    const_cast<ISSDrvProtocol*>(this)->write(data);
+    const_cast<IProtocol*>(this)->write(data);
   }
 };
 
@@ -27,7 +32,7 @@ class ISSDrvProtocol : public CreateToUniquePtr<ISSDrvProtocol> {
  * @brief 通信接口配置对象
  *
  */
-struct SSDrvI2CProtocolConfig {
+struct I2CProtocolConfig {
   uint8_t address;
   uint8_t sda;
   uint8_t scl;
@@ -37,17 +42,17 @@ struct SSDrvI2CProtocolConfig {
 /**
  * @brief I2C示例接口
  */
-class SSDrvI2CProtocol : public ISSDrvProtocol {
+class I2CProtocol : public IProtocol {
  private:
-  SSDrvI2CProtocolConfig m_config;
+  I2CProtocolConfig m_config;
 
  public:
-  explicit SSDrvI2CProtocol(SSDrvI2CProtocolConfig config)
+  explicit I2CProtocol(I2CProtocolConfig config)
       : m_config(std::move(config)) {
     m_config.wire.begin(m_config.sda, m_config.scl);
   }
-  SSDrvI2CProtocol() = delete;
-  ~SSDrvI2CProtocol() { m_config.wire.end(); };
+  I2CProtocol() = delete;
+  ~I2CProtocol() { m_config.wire.end(); };
 
   /**
    * @brief 向显示驱动发送数据
@@ -58,3 +63,7 @@ class SSDrvI2CProtocol : public ISSDrvProtocol {
     m_config.wire.endTransmission();
   };
 };
+
+}  // namespace protocol
+
+SSDRV_NS_END
