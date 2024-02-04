@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "ssdrv/constant.hpp"
+#include "ssdrv/utils/namesapce.hpp"
 #include "ssdrv/create.hpp"
 
 SSDRV_NS_BEGIN
