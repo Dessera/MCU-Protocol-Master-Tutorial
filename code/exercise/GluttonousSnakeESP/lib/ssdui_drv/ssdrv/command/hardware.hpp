@@ -12,18 +12,25 @@ namespace command::hardware {
  */
 class CommandSetStartLine : public Command {
  public:
-  inline static constexpr uint8_t COMMAND_PREFIX = 0x40;
+  static constexpr uint8_t COMMAND_PREFIX = 0x40;
 
  private:
-  uint8_t m_line{0};
+  uint8_t m_line;
 
  public:
   CommandSetStartLine(uint8_t line) : m_line(line) {}
-  CommandSetStartLine() = default;
+  CommandSetStartLine() = delete;
+
+  CommandSetStartLine(const CommandSetStartLine &) = default;
+  CommandSetStartLine(CommandSetStartLine &&) noexcept = default;
+  CommandSetStartLine &operator=(const CommandSetStartLine &) = default;
+  CommandSetStartLine &operator=(CommandSetStartLine &&) noexcept = default;
+
+  ~CommandSetStartLine() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
-    if (m_line >= context->height()) {
-      m_line = context->height() - 1;
+    if (m_line >= context->config().get_height()) {
+      m_line = context->config().get_height() - 1;
     }
     Command::apply(context, COMMAND_PREFIX | m_line);
   };
@@ -34,20 +41,26 @@ class CommandSetStartLine : public Command {
  */
 class CommandSetSegmentRemap : public Command {
  public:
-  inline static constexpr uint8_t NORMAL = 0xA0;
-  inline static constexpr uint8_t REMAP = 0xA1;
+  static constexpr uint8_t NORMAL = 0xA0;
+  static constexpr uint8_t REMAP = 0xA1;
 
  private:
-  bool m_remap{false};
+  bool m_remap;
 
  public:
   CommandSetSegmentRemap(bool remap) : m_remap(remap) {}
-  CommandSetSegmentRemap() = default;
+  CommandSetSegmentRemap() = delete;
 
-  inline uint8_t state() const { return m_remap ? REMAP : NORMAL; }
+  CommandSetSegmentRemap(const CommandSetSegmentRemap &) = default;
+  CommandSetSegmentRemap(CommandSetSegmentRemap &&) noexcept = default;
+  CommandSetSegmentRemap &operator=(const CommandSetSegmentRemap &) = default;
+  CommandSetSegmentRemap &operator=(CommandSetSegmentRemap &&) noexcept =
+      default;
+
+  ~CommandSetSegmentRemap() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
-    Command::apply(context, state());
+    Command::apply(context, m_remap ? REMAP : NORMAL);
   };
 };
 
@@ -59,22 +72,31 @@ using CommandSetHorizontalFlip = CommandSetSegmentRemap;
  */
 class CommandSetMultiplexRatio : public Command {
  public:
-  inline static constexpr uint8_t COMMAND_PREFIX = 0xA8;
-  inline static constexpr uint8_t DEFAULT_RATIO = 63;
+  static constexpr uint8_t COMMAND_PREFIX = 0xA8;
 
  private:
-  uint8_t m_ratio{DEFAULT_RATIO};
+  uint8_t m_ratio;
 
  public:
   CommandSetMultiplexRatio(uint8_t ratio) : m_ratio(ratio) {}
-  CommandSetMultiplexRatio() = default;
+  CommandSetMultiplexRatio() = delete;
 
+  CommandSetMultiplexRatio(const CommandSetMultiplexRatio &) = default;
+  CommandSetMultiplexRatio(CommandSetMultiplexRatio &&) noexcept = default;
+  CommandSetMultiplexRatio &operator=(const CommandSetMultiplexRatio &) =
+      default;
+  CommandSetMultiplexRatio &operator=(CommandSetMultiplexRatio &&) noexcept =
+      default;
+
+  ~CommandSetMultiplexRatio() = default;
+
+  // ! Auto handle the +1 issue
   void apply(std::shared_ptr<context::Context> context) final {
-    if (m_ratio >= context->width()) {
-      m_ratio = context->width() - 1;
+    if (m_ratio > context->config().get_width()) {
+      m_ratio = context->config().get_width();
     }
     Command::apply(context, COMMAND_PREFIX);
-    Command::apply(context, m_ratio);
+    Command::apply(context, m_ratio - 1);
   };
 };
 
@@ -83,20 +105,26 @@ class CommandSetMultiplexRatio : public Command {
  */
 class CommandSetScanDirection : public Command {
  public:
-  inline static constexpr uint8_t NORMAL = 0xC0;
-  inline static constexpr uint8_t REVERSE = 0xC8;
+  static constexpr uint8_t NORMAL = 0xC0;
+  static constexpr uint8_t REVERSE = 0xC8;
 
  private:
-  bool m_reverse{false};
+  bool m_reverse;
 
  public:
   CommandSetScanDirection(bool reverse) : m_reverse(reverse) {}
-  CommandSetScanDirection() = default;
+  CommandSetScanDirection() = delete;
 
-  inline uint8_t state() const { return m_reverse ? REVERSE : NORMAL; }
+  CommandSetScanDirection(const CommandSetScanDirection &) = default;
+  CommandSetScanDirection(CommandSetScanDirection &&) noexcept = default;
+  CommandSetScanDirection &operator=(const CommandSetScanDirection &) = default;
+  CommandSetScanDirection &operator=(CommandSetScanDirection &&) noexcept =
+      default;
+
+  ~CommandSetScanDirection() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
-    Command::apply(context, state());
+    Command::apply(context, m_reverse ? REVERSE : NORMAL);
   };
 };
 
@@ -108,19 +136,26 @@ using CommandSetVerticalFlip = CommandSetScanDirection;
  */
 class CommandSetDisplayOffset : public Command {
  public:
-  inline static constexpr uint8_t COMMAND_PREFIX = 0xD3;
-  inline static constexpr uint8_t DEFAULT_OFFSET = 0x00;
+  static constexpr uint8_t COMMAND_PREFIX = 0xD3;
 
  private:
-  uint8_t m_offset{DEFAULT_OFFSET};
+  uint8_t m_offset;
 
  public:
   CommandSetDisplayOffset(uint8_t offset) : m_offset(offset) {}
-  CommandSetDisplayOffset() = default;
+  CommandSetDisplayOffset() = delete;
+
+  CommandSetDisplayOffset(const CommandSetDisplayOffset &) = default;
+  CommandSetDisplayOffset(CommandSetDisplayOffset &&) noexcept = default;
+  CommandSetDisplayOffset &operator=(const CommandSetDisplayOffset &) = default;
+  CommandSetDisplayOffset &operator=(CommandSetDisplayOffset &&) noexcept =
+      default;
+
+  ~CommandSetDisplayOffset() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
-    if (m_offset >= context->config().page) {
-      m_offset = context->config().page - 1;
+    if (m_offset >= context->config().get_page()) {
+      m_offset = context->config().get_page() - 1;
     }
     Command::apply(context, COMMAND_PREFIX);
     Command::apply(context, m_offset);
@@ -132,15 +167,21 @@ class CommandSetDisplayOffset : public Command {
  */
 class CommandSetComPins : public Command {
  public:
-  inline static constexpr uint8_t COMMAND_PREFIX = 0xDA;
+  static constexpr uint8_t COMMAND_PREFIX = 0xDA;
 
  private:
-  context::ComPinConfiguration m_config{
-      context::ComPinConfiguration::ALTERNATIVE};
+  context::ComPinsConfig m_config;
 
  public:
-  CommandSetComPins(context::ComPinConfiguration config) : m_config(config) {}
-  CommandSetComPins() = default;
+  CommandSetComPins(context::ComPinsConfig config) : m_config(config) {}
+  CommandSetComPins() = delete;
+
+  CommandSetComPins(const CommandSetComPins &) = default;
+  CommandSetComPins(CommandSetComPins &&) noexcept = default;
+  CommandSetComPins &operator=(const CommandSetComPins &) = default;
+  CommandSetComPins &operator=(CommandSetComPins &&) noexcept = default;
+
+  ~CommandSetComPins() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
     Command::apply(context, COMMAND_PREFIX);

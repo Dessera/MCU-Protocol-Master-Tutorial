@@ -12,18 +12,24 @@ namespace command::clock {
  */
 class CommandSetDisplayClock : public Command {
  public:
-  inline static constexpr uint8_t COMMAND_PREFIX = 0xD5;
-  inline static constexpr uint8_t DEFAULT_RATIO = 0x00;
-  inline static constexpr uint8_t DEFAULT_FREQUENCY = 0x08;
+  static constexpr uint8_t COMMAND_PREFIX = 0xD5;
 
  private:
-  uint8_t m_ratio{DEFAULT_RATIO};
-  uint8_t m_frequency{DEFAULT_FREQUENCY};
+  uint8_t m_ratio;
+  uint8_t m_frequency;
 
  public:
   CommandSetDisplayClock(uint8_t ratio, uint8_t frequency)
       : m_ratio(ratio), m_frequency(frequency) {}
-  CommandSetDisplayClock() = default;
+  CommandSetDisplayClock() = delete;
+
+  CommandSetDisplayClock(const CommandSetDisplayClock &) = default;
+  CommandSetDisplayClock(CommandSetDisplayClock &&) noexcept = default;
+  CommandSetDisplayClock &operator=(const CommandSetDisplayClock &) = default;
+  CommandSetDisplayClock &operator=(CommandSetDisplayClock &&) noexcept =
+      default;
+
+  ~CommandSetDisplayClock() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
     Command::apply(context, COMMAND_PREFIX);
@@ -36,18 +42,25 @@ class CommandSetDisplayClock : public Command {
  */
 class CommandSetPrechargePeriod : public Command {
  public:
-  inline static constexpr uint8_t COMMAND_PREFIX = 0xD9;
-  inline static constexpr uint8_t DEFAULT_PHASE1 = 0x02;
-  inline static constexpr uint8_t DEFAULT_PHASE2 = 0x02;
+  static constexpr uint8_t COMMAND_PREFIX = 0xD9;
 
  private:
-  uint8_t m_phase1{DEFAULT_PHASE1};
-  uint8_t m_phase2{DEFAULT_PHASE2};
+  uint8_t m_phase1;
+  uint8_t m_phase2;
 
  public:
   CommandSetPrechargePeriod(uint8_t phase1, uint8_t phase2)
       : m_phase1(phase1), m_phase2(phase2) {}
-  CommandSetPrechargePeriod() = default;
+  CommandSetPrechargePeriod() = delete;
+
+  CommandSetPrechargePeriod(const CommandSetPrechargePeriod &) = default;
+  CommandSetPrechargePeriod(CommandSetPrechargePeriod &&) noexcept = default;
+  CommandSetPrechargePeriod &operator=(const CommandSetPrechargePeriod &) =
+      default;
+  CommandSetPrechargePeriod &operator=(CommandSetPrechargePeriod &&) noexcept =
+      default;
+
+  ~CommandSetPrechargePeriod() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
     Command::apply(context, COMMAND_PREFIX);
@@ -60,15 +73,24 @@ class CommandSetPrechargePeriod : public Command {
  */
 class CommandSetVcomhDeselectLevel : public Command {
  public:
-  inline static constexpr uint8_t COMMAND_PREFIX = 0xDB;
-  inline static constexpr uint8_t DEFAULT_LEVEL = 0x20;
+  static constexpr uint8_t COMMAND_PREFIX = 0xDB;
 
  private:
-  uint8_t m_level{DEFAULT_LEVEL};
+  uint8_t m_level;
 
  public:
   CommandSetVcomhDeselectLevel(uint8_t level) : m_level(level) {}
-  CommandSetVcomhDeselectLevel() = default;
+  CommandSetVcomhDeselectLevel() = delete;
+
+  CommandSetVcomhDeselectLevel(const CommandSetVcomhDeselectLevel &) = default;
+  CommandSetVcomhDeselectLevel(CommandSetVcomhDeselectLevel &&) noexcept =
+      default;
+  CommandSetVcomhDeselectLevel &operator=(
+      const CommandSetVcomhDeselectLevel &) = default;
+  CommandSetVcomhDeselectLevel &operator=(
+      CommandSetVcomhDeselectLevel &&) noexcept = default;
+
+  ~CommandSetVcomhDeselectLevel() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
     Command::apply(context, COMMAND_PREFIX);
@@ -81,7 +103,7 @@ class CommandSetVcomhDeselectLevel : public Command {
  */
 class CommandNop : public Command {
  public:
-  inline static constexpr uint8_t COMMAND_PREFIX = 0xE3;
+  static constexpr uint8_t COMMAND_PREFIX = 0xE3;
 
   void apply(std::shared_ptr<context::Context> context) final {
     Command::apply(context, COMMAND_PREFIX);

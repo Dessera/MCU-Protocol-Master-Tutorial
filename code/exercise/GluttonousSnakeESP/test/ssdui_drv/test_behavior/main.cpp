@@ -4,18 +4,14 @@
 #include <ssdrv/context.hpp>
 
 void setup() {
+  using ssdrv::protocol::I2CProtocol;
+  using ssdrv::protocol::I2CProtocolConfig;
+  using SSDrvContext = ssdrv::context::Context;
   Serial.begin(115200);
 
-  // auto context = SSDrvContext::create(
-  //     SSDrvContextConfig(ISSDrvProtocol::create<SSDrvI2CProtocol>(
-  //                            SSDrvI2CProtocolConfig{0x3c, 4, 5, Wire}),
-  //                        128, 64));
-
-  // SSDrvBehaviorBuilder(context)
-  //     .add(SSDrvBehavior::create<SSDrvBehaviorTest>())
-  //     .add(SSDrvBehavior::create<SSDrvBehaviorPrintWH>())
-  //     .add(SSDrvBehavior::create<SSDrvBehaviorWithParam>(123))
-  //     .apply();
+  auto protocol =
+      I2CProtocol::create<I2CProtocol>(I2CProtocolConfig{0x3C, 4, 5, Wire});
+  auto context = SSDrvContext::create(protocol);
 }
 
 void loop() { delay(1000); }

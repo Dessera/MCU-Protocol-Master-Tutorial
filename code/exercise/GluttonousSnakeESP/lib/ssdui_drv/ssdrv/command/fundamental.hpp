@@ -12,15 +12,21 @@ namespace command::fundamental {
  */
 class CommandSetContrast : public Command {
  public:
-  inline static constexpr uint8_t COMMAND_PREFIX = 0x81;
-  inline static constexpr uint8_t DEFAULT_CONTRAST = 0x7F;
+  static constexpr uint8_t COMMAND_PREFIX = 0x81;
 
  private:
-  uint8_t m_contrast{DEFAULT_CONTRAST};
+  uint8_t m_contrast;
 
  public:
   CommandSetContrast(uint8_t contrast) : m_contrast(contrast) {}
-  CommandSetContrast() = default;
+  CommandSetContrast() = delete;
+
+  CommandSetContrast(const CommandSetContrast &) = default;
+  CommandSetContrast(CommandSetContrast &&) noexcept = default;
+  CommandSetContrast &operator=(const CommandSetContrast &) = default;
+  CommandSetContrast &operator=(CommandSetContrast &&) noexcept = default;
+
+  ~CommandSetContrast() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
     Command::apply(context, COMMAND_PREFIX);
@@ -28,29 +34,33 @@ class CommandSetContrast : public Command {
   };
 };
 
-
-
 /**
  * @brief 设置显示全亮
  */
 class CommandEnableEntireDisplayOn : public Command {
  public:
-  inline static constexpr uint8_t DISPLAY_ALL_ON = 0xA5;
-  inline static constexpr uint8_t DISPLAY_NORMAL = 0xA4;
+  static constexpr uint8_t DISPLAY_ALL_ON = 0xA5;
+  static constexpr uint8_t DISPLAY_NORMAL = 0xA4;
 
  private:
-  bool m_state{false};
+  bool m_state;
 
  public:
   CommandEnableEntireDisplayOn(bool state) : m_state(state) {}
-  CommandEnableEntireDisplayOn() = default;
+  CommandEnableEntireDisplayOn() = delete;
 
-  inline uint8_t state() const {
-    return m_state ? DISPLAY_ALL_ON : DISPLAY_NORMAL;
-  }
+  CommandEnableEntireDisplayOn(const CommandEnableEntireDisplayOn &) = default;
+  CommandEnableEntireDisplayOn(CommandEnableEntireDisplayOn &&) noexcept =
+      default;
+  CommandEnableEntireDisplayOn &operator=(
+      const CommandEnableEntireDisplayOn &) = default;
+  CommandEnableEntireDisplayOn &operator=(
+      CommandEnableEntireDisplayOn &&) noexcept = default;
+
+  ~CommandEnableEntireDisplayOn() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
-    Command::apply(context, state());
+    Command::apply(context, m_state ? DISPLAY_ALL_ON : DISPLAY_NORMAL);
   };
 };
 
@@ -59,46 +69,54 @@ class CommandEnableEntireDisplayOn : public Command {
  */
 class CommandSetInverseDisplay : public Command {
  public:
-  inline static constexpr uint8_t DISPLAY_INVERSE = 0xA7;
-  inline static constexpr uint8_t DISPLAY_NORMAL = 0xA6;
+  static constexpr uint8_t DISPLAY_INVERSE = 0xA7;
+  static constexpr uint8_t DISPLAY_NORMAL = 0xA6;
 
  private:
-  bool m_state{false};
+  bool m_state;
 
  public:
   CommandSetInverseDisplay(bool state) : m_state(state) {}
-  CommandSetInverseDisplay() = default;
+  CommandSetInverseDisplay() = delete;
 
-  inline uint8_t state() const {
-    return m_state ? DISPLAY_INVERSE : DISPLAY_NORMAL;
-  }
+  CommandSetInverseDisplay(const CommandSetInverseDisplay &) = default;
+  CommandSetInverseDisplay(CommandSetInverseDisplay &&) noexcept = default;
+  CommandSetInverseDisplay &operator=(const CommandSetInverseDisplay &) =
+      default;
+  CommandSetInverseDisplay &operator=(CommandSetInverseDisplay &&) noexcept =
+      default;
+
+  ~CommandSetInverseDisplay() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
-    Command::apply(context, state());
+    Command::apply(context, m_state ? DISPLAY_INVERSE : DISPLAY_NORMAL);
   };
 };
-
-
 
 /**
  * @brief 显示开关
  */
 class CommandEnableDisplay : public Command {
  public:
-  inline static constexpr uint8_t DISPLAY_ON = 0xAF;
-  inline static constexpr uint8_t DISPLAY_OFF = 0xAE;
+  static constexpr uint8_t DISPLAY_ON = 0xAF;
+  static constexpr uint8_t DISPLAY_OFF = 0xAE;
 
  private:
-  bool m_state{true};
+  bool m_state;
 
  public:
   CommandEnableDisplay(bool state) : m_state(state) {}
-  CommandEnableDisplay() = default;
+  CommandEnableDisplay() = delete;
 
-  inline uint8_t state() const { return m_state ? DISPLAY_ON : DISPLAY_OFF; }
+  CommandEnableDisplay(const CommandEnableDisplay &) = default;
+  CommandEnableDisplay(CommandEnableDisplay &&) noexcept = default;
+  CommandEnableDisplay &operator=(const CommandEnableDisplay &) = default;
+  CommandEnableDisplay &operator=(CommandEnableDisplay &&) noexcept = default;
+
+  ~CommandEnableDisplay() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
-    Command::apply(context, state());
+    Command::apply(context, m_state ? DISPLAY_ON : DISPLAY_OFF);
   };
 };
 

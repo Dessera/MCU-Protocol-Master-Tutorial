@@ -8,6 +8,7 @@ SSDRV_NS_BEGIN
 namespace command::scroll {
 
 // TODO: Add scroll commands here
+// ? Scroll不应该是初始化命令
 
 }  // namespace command::scroll
 
