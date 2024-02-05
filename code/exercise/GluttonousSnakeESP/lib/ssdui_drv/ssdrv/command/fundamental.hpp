@@ -29,6 +29,7 @@ class CommandSetContrast : public Command {
   ~CommandSetContrast() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set contrast: %d", m_contrast);
     Command::apply(context, COMMAND_PREFIX);
     Command::apply(context, m_contrast);
   };
@@ -60,6 +61,7 @@ class CommandEnableEntireDisplayOn : public Command {
   ~CommandEnableEntireDisplayOn() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set entire display to %s", m_state ? "ON" : "OFF");
     Command::apply(context, m_state ? DISPLAY_ALL_ON : DISPLAY_NORMAL);
   };
 };
@@ -89,6 +91,7 @@ class CommandSetInverseDisplay : public Command {
   ~CommandSetInverseDisplay() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set inverse display to %s", m_state ? "ON" : "OFF");
     Command::apply(context, m_state ? DISPLAY_INVERSE : DISPLAY_NORMAL);
   };
 };
@@ -116,6 +119,7 @@ class CommandEnableDisplay : public Command {
   ~CommandEnableDisplay() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set display to %s", m_state ? "ON" : "OFF");
     Command::apply(context, m_state ? DISPLAY_ON : DISPLAY_OFF);
   };
 };

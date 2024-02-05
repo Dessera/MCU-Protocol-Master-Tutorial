@@ -3,9 +3,11 @@
 #include <Wire.h>
 
 #include <cstdint>
+#include <numeric>
+#include <vector>
 
-#include "ssdrv/utils/namesapce.hpp"
 #include "ssdrv/create.hpp"
+#include "ssdrv/utils/namesapce.hpp"
 
 SSDRV_NS_BEGIN
 
@@ -22,11 +24,8 @@ class IProtocol : public CreateToUniquePtr<IProtocol> {
   /**
    * @brief 向显示驱动发送数据
    */
-  virtual void write(uint8_t data) = 0;
-
-  void write(uint8_t data) const {
-    const_cast<IProtocol*>(this)->write(data);
-  }
+  // virtual std::size_t write(uint8_t data) = 0;
+  virtual std::size_t write(const std::vector<uint8_t>& data) = 0;
 };
 
 /**
@@ -37,7 +36,7 @@ struct I2CProtocolConfig {
   uint8_t address;
   uint8_t sda;
   uint8_t scl;
-  TwoWire& wire;
+  // TwoWire& wire;
 };
 
 /**
@@ -45,23 +44,31 @@ struct I2CProtocolConfig {
  */
 class I2CProtocol : public IProtocol {
  private:
+  TwoWire& m_wire;
   I2CProtocolConfig m_config;
 
  public:
-  explicit I2CProtocol(I2CProtocolConfig config)
-      : m_config(std::move(config)) {
-    m_config.wire.begin(m_config.sda, m_config.scl);
+  explicit I2CProtocol(TwoWire& wire, I2CProtocolConfig config)
+      : m_wire(wire), m_config(std::move(config)) {
+    m_wire.setPins(m_config.sda, m_config.scl);
+    m_wire.begin();
   }
   I2CProtocol() = delete;
-  ~I2CProtocol() { m_config.wire.end(); };
+  ~I2CProtocol() { m_wire.end(); };
 
   /**
    * @brief 向显示驱动发送数据
    */
-  void write(uint8_t data) override {
-    m_config.wire.beginTransmission(m_config.address);
-    m_config.wire.write(data);
-    m_config.wire.endTransmission();
+  std::size_t write(const std::vector<uint8_t>& data) override {
+    m_wire.beginTransmission(m_config.address);
+
+    std::size_t send = std::accumulate(
+        data.begin(), data.end(), 0,
+        [&](std::size_t acc, uint8_t d) { return acc + m_wire.write(d); });
+
+    m_wire.endTransmission();
+
+    return send;
   };
 };
 

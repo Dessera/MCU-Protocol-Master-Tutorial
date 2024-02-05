@@ -32,6 +32,8 @@ class CommandSetDisplayClock : public Command {
   ~CommandSetDisplayClock() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set display clock: ratio = %d, frequency = %d", m_ratio,
+          m_frequency);
     Command::apply(context, COMMAND_PREFIX);
     Command::apply(context, (m_frequency << 4) | m_ratio);
   };
@@ -63,8 +65,10 @@ class CommandSetPrechargePeriod : public Command {
   ~CommandSetPrechargePeriod() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set precharge period: phase1 = %d, phase2 = %d", m_phase1,
+          m_phase2);
     Command::apply(context, COMMAND_PREFIX);
-    Command::apply(context, (m_phase1 << 4) | m_phase2);
+    Command::apply(context, (m_phase2 << 4) | m_phase1);
   };
 };
 
@@ -93,8 +97,33 @@ class CommandSetVcomhDeselectLevel : public Command {
   ~CommandSetVcomhDeselectLevel() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set VCOMH deselect level: %d", m_level);
     Command::apply(context, COMMAND_PREFIX);
     Command::apply(context, m_level);
+  };
+};
+
+class CommandSetChargePump : public Command {
+ public:
+  static constexpr uint8_t COMMAND_PREFIX = 0x8D;
+
+ private:
+  bool m_enable;
+
+ public:
+  CommandSetChargePump(bool enable) : m_enable(enable) {}
+  CommandSetChargePump() = delete;
+
+  CommandSetChargePump(const CommandSetChargePump &) = default;
+  CommandSetChargePump(CommandSetChargePump &&) noexcept = default;
+  CommandSetChargePump &operator=(const CommandSetChargePump &) = default;
+  CommandSetChargePump &operator=(CommandSetChargePump &&) noexcept = default;
+
+  ~CommandSetChargePump() = default;
+
+  void apply(std::shared_ptr<context::Context> context) final {
+    Command::apply(context, COMMAND_PREFIX);
+    Command::apply(context, m_enable ? 0x14 : 0x10);
   };
 };
 

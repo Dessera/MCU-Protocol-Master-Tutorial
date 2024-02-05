@@ -30,8 +30,11 @@ class CommandSetStartLine : public Command {
 
   void apply(std::shared_ptr<context::Context> context) final {
     if (m_line >= context->config().get_height()) {
+      log_e("==> Start line is too large, set to max: %d",
+            context->config().get_height() - 1);
       m_line = context->config().get_height() - 1;
     }
+    log_i("==> Set start line: %d", m_line);
     Command::apply(context, COMMAND_PREFIX | m_line);
   };
 };
@@ -60,6 +63,7 @@ class CommandSetSegmentRemap : public Command {
   ~CommandSetSegmentRemap() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set segment remap: %d", m_remap);
     Command::apply(context, m_remap ? REMAP : NORMAL);
   };
 };
@@ -92,9 +96,12 @@ class CommandSetMultiplexRatio : public Command {
 
   // ! Auto handle the +1 issue
   void apply(std::shared_ptr<context::Context> context) final {
-    if (m_ratio > context->config().get_width()) {
-      m_ratio = context->config().get_width();
+    if (m_ratio > context->config().get_height()) {
+      log_e("==> Multiplex ratio is too large, set to max: %d",
+            context->config().get_height());
+      m_ratio = context->config().get_height();
     }
+    log_i("==> Set multiplex ratio: %d", m_ratio);
     Command::apply(context, COMMAND_PREFIX);
     Command::apply(context, m_ratio - 1);
   };
@@ -124,6 +131,7 @@ class CommandSetScanDirection : public Command {
   ~CommandSetScanDirection() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set scan direction reverse: %d", m_reverse);
     Command::apply(context, m_reverse ? REVERSE : NORMAL);
   };
 };
@@ -154,9 +162,12 @@ class CommandSetDisplayOffset : public Command {
   ~CommandSetDisplayOffset() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
-    if (m_offset >= context->config().get_page()) {
-      m_offset = context->config().get_page() - 1;
+    if (m_offset >= context->config().get_height()) {
+      log_e("==> Display offset is too large, set to max: %d",
+            context->config().get_height() - 1);
+      m_offset = context->config().get_height() - 1;
     }
+    log_i("==> Set display offset: %d", m_offset);
     Command::apply(context, COMMAND_PREFIX);
     Command::apply(context, m_offset);
   };
@@ -184,6 +195,7 @@ class CommandSetComPins : public Command {
   ~CommandSetComPins() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("==> Set COM pins: 0x%02X", static_cast<uint8_t>(m_config));
     Command::apply(context, COMMAND_PREFIX);
     Command::apply(context, static_cast<uint8_t>(m_config));
   };

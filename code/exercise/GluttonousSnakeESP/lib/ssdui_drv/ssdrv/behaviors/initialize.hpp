@@ -21,8 +21,10 @@ class InitializationBehavior : public behavior::IBehavior {
   void apply(std::shared_ptr<context::Context> context) override {
     using namespace command;
 
+    log_i("==> Start initializing the display");
+
     auto& config = context->config();
-    behavior::BehaviorBuilder(context)
+    behavior::BehaviorBuilder()
         .add(Command::create<fundamental::CommandEnableDisplay>(false))
         .add(Command::create<clock::CommandSetDisplayClock>(
             config.get_clock_ratio(), config.get_clock_frequency()))
@@ -50,9 +52,16 @@ class InitializationBehavior : public behavior::IBehavior {
             config.get_entire_display_on()))
         .add(Command::create<fundamental::CommandSetInverseDisplay>(
             config.get_inverse_display()))
+        // set cursor
+        .add(Command::create<address::CommandSetPageAddress>(
+            config.get_page_start(), config.get_page_end()))
+        .add(Command::create<address::CommandSetColumnAddress>(
+            config.get_column_start(), config.get_column_end()))
         .add(Command::create<fundamental::CommandEnableDisplay>(
             config.get_display_on()))
-        .apply();
+        .apply(context);
+
+    log_i("<== Finish initializing the display");
   }
 };
 

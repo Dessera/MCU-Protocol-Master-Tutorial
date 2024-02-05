@@ -32,6 +32,7 @@ class CommandSetStartColumn : public Command {
   void apply(std::shared_ptr<context::Context> context) final {
     if (context->config().get_addressing_mode() !=
         context::AddressingMode::PAGE) {
+      log_e("Addressing mode is not PAGE, cannot set start column");
       return;
     }
     if (m_column >= context->config().get_width()) {
@@ -39,6 +40,41 @@ class CommandSetStartColumn : public Command {
     }
     Command::apply(context, LOW_COMMAND_PREFIX | (m_column & 0x0F));
     Command::apply(context, HIGH_COMMAND_PREFIX | (m_column >> 4));
+  };
+};
+
+/**
+ * @brief 设置页地址
+ * @details 10.1.13 Set Page Start Address for Page Addressing Mode (B0h~B7h)
+ */
+class CommandSetStartPage : public Command {
+ public:
+  static constexpr uint8_t COMMAND_PREFIX = 0xB0;
+
+ private:
+  uint8_t m_page;
+
+ public:
+  CommandSetStartPage(uint8_t page) : m_page(page) {}
+  CommandSetStartPage() = delete;
+
+  CommandSetStartPage(const CommandSetStartPage &) = default;
+  CommandSetStartPage(CommandSetStartPage &&) noexcept = default;
+  CommandSetStartPage &operator=(const CommandSetStartPage &) = default;
+  CommandSetStartPage &operator=(CommandSetStartPage &&) noexcept = default;
+
+  ~CommandSetStartPage() = default;
+
+  void apply(std::shared_ptr<context::Context> context) final {
+    if (context->config().get_addressing_mode() !=
+        context::AddressingMode::PAGE) {
+      log_e("Addressing mode is not PAGE, cannot set start page");
+      return;
+    }
+    if (m_page >= context->config().get_page()) {
+      m_page = context->config().get_page() - 1;
+    }
+    Command::apply(context, m_page | COMMAND_PREFIX);
   };
 };
 
@@ -66,6 +102,7 @@ class CommandSetAddressingMode : public Command {
   ~CommandSetAddressingMode() = default;
 
   void apply(std::shared_ptr<context::Context> context) final {
+    log_i("Set addressing mode to %d", static_cast<uint8_t>(m_mode));
     Command::apply(context, COMMAND_PREFIX | static_cast<uint8_t>(m_mode));
   };
 };
@@ -97,6 +134,8 @@ class CommandSetColumnAddress : public Command {
   void apply(std::shared_ptr<context::Context> context) final {
     if (context->config().get_addressing_mode() ==
         context::AddressingMode::PAGE) {
+      // downgrade to set start column
+      CommandSetStartColumn(m_start_column).apply(context);
       return;
     }
     if (m_start_column >= context->config().get_width()) {
@@ -137,6 +176,8 @@ class CommandSetPageAddress : public Command {
   void apply(std::shared_ptr<context::Context> context) final {
     if (context->config().get_addressing_mode() ==
         context::AddressingMode::PAGE) {
+      // downgrade to set start page
+      CommandSetStartPage(m_start_page).apply(context);
       return;
     }
     if (m_start_page >= context->config().get_page()) {
@@ -148,40 +189,6 @@ class CommandSetPageAddress : public Command {
     Command::apply(context, COMMAND_PREFIX);
     Command::apply(context, m_start_page);
     Command::apply(context, m_end_page);
-  };
-};
-
-/**
- * @brief 设置页地址
- * @details 10.1.13 Set Page Start Address for Page Addressing Mode (B0h~B7h)
- */
-class CommandSetStartPage : public Command {
- public:
-  static constexpr uint8_t COMMAND_PREFIX = 0xB0;
-
- private:
-  uint8_t m_page;
-
- public:
-  CommandSetStartPage(uint8_t page) : m_page(page) {}
-  CommandSetStartPage() = delete;
-
-  CommandSetStartPage(const CommandSetStartPage &) = default;
-  CommandSetStartPage(CommandSetStartPage &&) noexcept = default;
-  CommandSetStartPage &operator=(const CommandSetStartPage &) = default;
-  CommandSetStartPage &operator=(CommandSetStartPage &&) noexcept = default;
-
-  ~CommandSetStartPage() = default;
-
-  void apply(std::shared_ptr<context::Context> context) final {
-    if (context->config().get_addressing_mode() !=
-        context::AddressingMode::PAGE) {
-      return;
-    }
-    if (m_page >= context->config().get_page()) {
-      m_page = context->config().get_page() - 1;
-    }
-    Command::apply(context, m_page | COMMAND_PREFIX);
   };
 };
 
