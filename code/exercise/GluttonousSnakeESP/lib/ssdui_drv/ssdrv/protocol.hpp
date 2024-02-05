@@ -36,7 +36,6 @@ struct I2CProtocolConfig {
   uint8_t address;
   uint8_t sda;
   uint8_t scl;
-  // TwoWire& wire;
 };
 
 /**

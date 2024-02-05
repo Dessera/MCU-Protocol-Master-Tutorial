@@ -103,7 +103,8 @@ class CommandSetAddressingMode : public Command {
 
   void apply(std::shared_ptr<context::Context> context) final {
     log_i("Set addressing mode to %d", static_cast<uint8_t>(m_mode));
-    Command::apply(context, COMMAND_PREFIX | static_cast<uint8_t>(m_mode));
+    Command::apply(context, COMMAND_PREFIX);
+    Command::apply(context, static_cast<uint8_t>(m_mode));
   };
 };
 
