@@ -7,3 +7,7 @@
 - `i2c_tutorial_example.cpp`：I2C协议的练习源文件（标准实现）
 - `uart_tutorial.cpp`：UART协议的练习源文件（标准实现）
 - `platform.txt`：本次课程提供的 Arduino IDE 工具链适配文件
+
+我们要用到以下两个文件来修改环境：
+
+![重要文件](/00/000-important-files.png)
